@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* **هذا هو السطر الإضافي والضروري لفرض اتجاه RTL** */
+body {
+  direction: rtl; 
+  text-align: right; 
+}
