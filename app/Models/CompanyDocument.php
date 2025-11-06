@@ -12,12 +12,13 @@ class CompanyDocument extends Model
     protected $fillable = [
         'company_id',
         'document_type',
-        'file_path',
-        'status',
+        'document_file',
         'expiry_date',
+        'document_status',
+        'notes',
+        // 'document_number', // ❌ تم إزالته من fillable
     ];
-    
-    // العلاقة: الوثيقة تنتمي لشركة مستفيدة واحدة
+
     public function company()
     {
         return $this->belongsTo(BeneficiaryCompany::class, 'company_id');

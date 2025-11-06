@@ -8,24 +8,27 @@ use Illuminate\Database\Eloquent\Model;
 class Distributor extends Model
 {
     use HasFactory;
-    
-    // ==========================================================
-    // **الحل هنا:** يجب إضافة جميع أسماء الأعمدة إلى هذه القائمة
-    // ==========================================================
-   protected $fillable = [
+
+    protected $fillable = [
         'name',
-        'manager_name',
-        'phone_number',
-        'email',
+        'manager_name', // ✅ تم التعديل ليتوافق مع migration 'manager_name'
+        'email', // ✅ أضفته ليتوافق مع migration
+        'phone',
+        'delegate_name', // ✅ أضفته ليتوافق مع migration
+        'delegate_phone', // ✅ أضفته ليتوافق مع migration
+        'region',
+        'city',
         'address',
-        'latitude',
-        'longitude',
-        'is_active',
+        'latitude', // ✅ أضفته ليتوافق مع migration
+        'longitude', // ✅ أضفته ليتوافق مع migration
     ];
 
-    // العلاقة: الموزع الواحد لديه عدة شركات مستفيدة
-    public function beneficiaryCompanies()
+    /**
+     * العلاقة مع محطات الوقود
+     * كل شركة توزيع تمتلك عدة محطات وقود
+     */
+    public function fuelStations()
     {
-        return $this->hasMany(BeneficiaryCompany::class);
+        return $this->hasMany(FuelStation::class);
     }
 }

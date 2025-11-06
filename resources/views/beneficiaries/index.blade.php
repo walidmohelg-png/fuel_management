@@ -1,79 +1,134 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('إدارة الشركات المستفيدة') }}
+            🧾 {{ __('الشركات المستفيدة') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            {{-- عرض رسالة النجاح --}}
-            @if(session('success'))
-                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
-                    <p>{{ session('success') }}</p>
+
+            {{-- رسالة نجاح --}}
+            @if (session('success'))
+                <div class="mb-4 p-3 bg-green-100 border border-green-300 text-green-800 rounded">
+                    {{ session('success') }}
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                
-                <div class="flex justify-start mb-4">
-                    <a href="{{ route('beneficiaries.create') }}" class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                        {{ __('إضافة شركة مستفيدة جديدة') }}
+            <div class="bg-white shadow-md sm:rounded-lg p-6">
+
+                {{-- شريط الأدوات مع زر إضافة شركة جديدة --}}
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                    <a href="{{ route('beneficiaries.create_step_1') }}"
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition shadow-sm">
+                        ➕ {{ __('إضافة شركة جديدة') }}
                     </a>
                 </div>
 
-                {{-- جدول عرض البيانات --}}
+                {{-- فلاتر البحث --}}
+                <div class="mb-6">
+                    <form method="GET" action="{{ route('beneficiaries.index') }}" class="flex flex-wrap items-end gap-4">
+
+                        {{-- مربع البحث --}}
+                        <div class="flex-1 min-w-[200px]">
+                            <label for="search" class="block text-sm text-gray-600 mb-1">{{ __('بحث بالاسم أو المدير') }}</label>
+                            <input type="text" name="search" id="search"
+                                value="{{ request('search') }}"
+                                placeholder="{{ __('ابحث هنا...') }}"
+                                class="border border-gray-300 rounded-md px-3 py-2 w-full focus:ring focus:ring-indigo-200">
+                        </div>
+
+                        {{-- فلتر المنطقة - أصبح مربع إدخال نصي --}}
+                        <div class="w-40 min-w-[120px]">
+                            <label for="region" class="block text-sm text-gray-600 mb-1">{{ __('المنطقة') }}</label>
+                            <input type="text" name="region" id="region"
+                                   value="{{ request('region') }}"
+                                   placeholder="{{ __('الكل') }}"
+                                   class="border border-gray-300 rounded-md px-3 py-2 w-full focus:ring focus:ring-indigo-200">
+                        </div>
+
+                        {{-- فلتر المدينة - أصبح مربع إدخال نصي --}}
+                        <div class="w-40 min-w-[120px]">
+                            <label for="city" class="block text-sm text-gray-600 mb-1">{{ __('المدينة') }}</label>
+                            <input type="text" name="city" id="city"
+                                   value="{{ request('city') }}"
+                                   placeholder="{{ __('الكل') }}"
+                                   class="border border-gray-300 rounded-md px-3 py-2 w-full focus:ring focus:ring-indigo-200">
+                        </div>
+
+                        {{-- زر تصفية --}}
+                        <div>
+                            <button type="submit"
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-md shadow-sm transition duration-150 ease-in-out">
+                                {{ __('تصفية') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+
+                {{-- الجدول --}}
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                    <table class="min-w-full border border-gray-200 text-sm text-center table-auto">
+                        <thead class="bg-gray-100 text-gray-700">
                             <tr>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('اسم الشركة') }}</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('الرمز/النشاط') }}</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('المخصص (لتر)') }}</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('المورد') }}</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('الحالة') }}</th>
-                                <th class="px-6 py-3"></th> {{-- لزر الإجراءات --}}
+                                <th class="border px-3 py-2">#</th>
+                                <th class="border px-3 py-2">{{ __('اسم الشركة') }}</th>
+                                <th class="border px-3 py-2">{{ __('المدير') }}</th>
+                                <th class="border px-3 py-2">{{ __('الهاتف') }}</th>
+                                <th class="border px-3 py-2">{{ __('المدينة') }}</th>
+                                <th class="border px-3 py-2">{{ __('المنطقة') }}</th> {{-- ✅ أضفنا عمود المنطقة --}}
+                                <th class="border px-3 py-2">{{ __('الموقع') }}</th>
+                                <th class="border px-3 py-2">{{ __('العمليات') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            {{-- التحقق من وجود بيانات --}}
+                        <tbody>
                             @forelse ($beneficiaries as $company)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $company->name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $company->fuel_code ?? '-' }} / {{ $company->activity_type ?? '-' }}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border px-3 py-2">{{ $loop->iteration }}</td>
+                                    <td class="border px-3 py-2 font-medium text-indigo-700">
+                                        {{ $company->name }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ number_format($company->details->monthly_allowance ?? 0) }} {{ $company->details->fuel_type ?? '' }}
+                                    <td class="border px-3 py-2">{{ $company->companyDetail->authorized_person_name ?? '-' }}</td>
+                                    <td class="border px-3 py-2">{{ $company->companyDetail->representative_phone ?? '-' }}</td>
+                                    <td class="border px-3 py-2">{{ $company->companyDetail->city ?? '-' }}</td>
+                                    <td class="border px-3 py-2">{{ $company->companyDetail->region ?? '-' }}</td> {{-- ✅ عرض المنطقة --}}
+                                    <td class="border px-3 py-2">
+                                        @if ($company->latitude && $company->longitude)
+                                            <a href="https://www.google.com/maps?q={{ $company->latitude }},{{ $company->longitude }}"
+                                               target="_blank" class="text-blue-600 hover:underline">🗺️ {{ __('عرض على الخريطة') }}</a>
+                                        @else
+                                            <span class="text-gray-400">{{ __('غير متوفر') }}</span>
+                                        @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $company->distributor->name ?? 'غير محدد' }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            @if($company->current_status == 'active') bg-green-100 text-green-800
-                                            @elseif($company->current_status == 'suspended') bg-red-100 text-red-800
-                                            @else bg-yellow-100 text-yellow-800
-                                            @endif">
-                                            {{ __($company->current_status) }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
-                                        <a href="{{ route('beneficiaries.edit', $company->id) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('عرض/تعديل') }}</a>
-                                        <a href="#" class="text-red-600 hover:text-red-900 ms-3">{{ __('حذف') }}</a>
+                                    <td class="border px-3 py-2 text-center flex justify-center space-x-2 space-x-reverse">
+                                        <a href="{{ route('beneficiaries.show', ['beneficiaryCompany' => $company->id]) }}"
+                                           class="text-blue-600 hover:text-blue-800">{{ __('عرض') }}</a>
+                                        <a href="{{ route('beneficiaries.edit', ['beneficiaryCompany' => $company->id]) }}"
+                                           class="text-yellow-600 hover:text-yellow-800">{{ __('تعديل') }}</a>
+                                        <form action="{{ route('beneficiaries.destroy', ['beneficiaryCompany' => $company->id]) }}" method="POST"
+                                              class="inline"
+                                              onsubmit="return confirm('{{ __('هل أنت متأكد من حذف هذه الشركة؟') }}');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="text-red-600 hover:text-red-800">{{ __('حذف') }}</button>
+                                        </form>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                                        {{ __('لا توجد بيانات لشركات المستفيدة حالياً.') }}
-                                    </td>
+                                    <td colspan="8" class="py-4 text-gray-500">{{ __('لا توجد شركات مستفيدة حالياً.') }}</td> {{-- ✅ تم تعديل colspan --}}
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
 
+                {{-- روابط الصفحات --}}
+                <div class="mt-4">
+                    {{ $beneficiaries->links() }}
+                </div>
             </div>
         </div>
     </div>
